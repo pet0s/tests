@@ -1,1 +1,217 @@
+/* styles.css */
+:root{
+  --bg: #cfcfcf;
+  --red: #e1371f;
+  --white: #ffffff;
+
+  /* scene sizing */
+  --w: min(92vw, 980px);
+  --h: min(92vh, 980px);
+
+  --panel-w: clamp(320px, 55vw, 620px);
+  --panel-h: clamp(420px, 70vh, 760px);
+
+  /* perspective + rotations */
+  --persp: 1200px;
+  --front-rot-y: -28deg;
+  --front-rot-x: 0deg;
+  --front-z: 110px;
+
+  --back-rot-y: -28deg;
+  --back-rot-x: 0deg;
+  --back-z: 0px;
+
+  --font: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica;
+}
+
+*{ box-sizing: border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  background: #222; /* outer frame like your screenshots */
+  display:grid;
+  place-items:center;
+  font-family: var(--font);
+}
+
+.stage{
+  width: var(--w);
+  height: var(--h);
+  background: var(--bg);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 3D scene */
+.scene{
+  width: 100%;
+  height: 100%;
+  position: relative;
+  perspective: var(--persp);
+  transform-style: preserve-3d;
+}
+
+/* panels */
+.panel{
+  position: absolute;
+  top: 7%;
+  right: 9%;
+  width: var(--panel-w);
+  height: var(--panel-h);
+  transform-style: preserve-3d;
+}
+
+.panel__inner{
+  width: 100%;
+  height: 100%;
+  padding: clamp(18px, 2.2vw, 26px);
+  display:flex;
+  flex-direction:column;
+  gap: 14px;
+  justify-content: space-between;
+}
+
+/* back panel */
+.panel--back{
+  transform:
+    translateZ(var(--back-z))
+    rotateY(var(--back-rot-y))
+    rotateX(var(--back-rot-x));
+}
+.panel--back .panel__inner{
+  background: transparent; /* looks like text floating on bg */
+}
+
+/* front panel */
+.panel--front{
+  transform:
+    translateZ(var(--front-z))
+    rotateY(var(--front-rot-y))
+    rotateX(var(--front-rot-x));
+}
+.panel--front .panel__inner{
+  background: var(--red);
+}
+
+/* typography */
+.copy{
+  margin:0;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  font-size: clamp(13px, 1.35vw, 18px);
+  font-weight: 500;
+}
+.copy--white{ color: var(--white); }
+.copy--red{ color: var(--red); }
+
+.brand{
+  text-transform: uppercase;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+/* QR placeholders */
+.qr{
+  width: clamp(70px, 9vw, 110px);
+  aspect-ratio: 1/1;
+  align-self: flex-end;
+  border-radius: 6px;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.55) 1px, transparent 1px) 0 0 / 8px 8px,
+    linear-gradient(0deg, rgba(255,255,255,.55) 1px, transparent 1px) 0 0 / 8px 8px;
+}
+.qr--front{
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.7) 1px, transparent 1px) 0 0 / 7px 7px,
+    linear-gradient(0deg, rgba(255,255,255,.7) 1px, transparent 1px) 0 0 / 7px 7px;
+  border: 2px solid rgba(255,255,255,.7);
+}
+.qr--back{
+  background:
+    linear-gradient(90deg, rgba(227,55,31,.6) 1px, transparent 1px) 0 0 / 7px 7px,
+    linear-gradient(0deg, rgba(227,55,31,.6) 1px, transparent 1px) 0 0 / 7px 7px;
+  border: 2px solid rgba(227,55,31,.55);
+}
+
+/* CUTOUT WORD (second image effect)
+   - A "fill" layer that repeats the same paragraph as texture
+   - The word uses background-clip:text + a stripe mask
+*/
+.cutout{
+  position:absolute;
+  left: 6%;
+  top: 26%;
+  width: min(52%, 520px);
+  height: min(60%, 600px);
+  transform:
+    translateZ(140px)
+    rotateY(-18deg);
+  transform-style: preserve-3d;
+  pointer-events:none;
+}
+
+/* this is the “texture” shown inside the word */
+.cutout__fill{
+  position:absolute;
+  inset:0;
+  opacity: 1;
+  /* fake “text texture” using repeating lines */
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(227,55,31,0.0) 0px,
+      rgba(227,55,31,0.0) 16px,
+      rgba(227,55,31,0.12) 16px,
+      rgba(227,55,31,0.12) 17px
+    );
+}
+
+/* the word itself */
+.cutout__word{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-transform: lowercase;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  font-size: clamp(86px, 11vw, 150px);
+  line-height: 0.85;
+
+  /* show the “texture” through the letters */
+  color: transparent;
+  background:
+    /* red “text-like” base */
+    repeating-linear-gradient(
+      0deg,
+      rgba(227,55,31,1) 0px,
+      rgba(227,55,31,1) 18px,
+      rgba(227,55,31,0) 18px,
+      rgba(227,55,31,0) 34px
+    );
+  -webkit-background-clip: text;
+  background-clip: text;
+
+  /* make it look like cut-out strips */
+  -webkit-mask-image: repeating-linear-gradient(
+    180deg,
+    #000 0px,
+    #000 18px,
+    rgba(0,0,0,0) 18px,
+    rgba(0,0,0,0) 34px
+  );
+  mask-image: repeating-linear-gradient(
+    180deg,
+    #000 0px,
+    #000 18px,
+    rgba(0,0,0,0) 18px,
+    rgba(0,0,0,0) 34px
+  );
+}
+
+/* optional: slight “shadow” depth like print mockup */
+.panel--front .panel__inner{
+  box-shadow: 0 30px 70px rgba(0,0,0,.18);
+}
 
